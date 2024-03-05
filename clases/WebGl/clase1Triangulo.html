@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<!--inicia despues de la carga de la pagina -->
+<body onload ="star();">
+    <canvas width="640" height="480" id="webglCanvas"></canvas>
+
+    <script type="text/javascript">
+
+        let gl;
+        let canvas;
+
+        let VERTEX_SOURCE = 
+        `
+        #version 300 es
+        int vec2 in_position;
+        in vec3 in_color;
+        out vec3 o_color;
+
+        void main()
+        {
+            o_color = in_color;
+            gl_Position = vec4(in_position.x,in_position.y, 0, 1);
+        }
+        `;
+
+        let FRAGMENT_SOURCE =
+        `
+        #version 300 es
+        precision mediump float;
+        in ve3 o_color; 
+        out vec4color;
+        void main()
+        {
+            color =vec4(o_color,1);
+        }
+        `;
+
+        let program;
+        let vbo_position;
+        let vbo_color;
+        let in_position_loc;
+        let in_color_loc;
+
+
+        function start()
+        {
+            canvas =document.getElementById("webglCanvas");
+            gl = canvas.getContext("webgl12") 
+              canvas.getContext("webgl")  
+              canvas.getContext("experimental-webgl");
+
+              if(!gl){
+                console.log("error en iniciar");
+            }
+
+            console.log(gl.getParameter(gl.VERSION));
+            console.log(gl.getParameter(gl.SHADING_LANGUAGE_VERSION));
+
+            let vertextShader = gl.createShader(gl.VERTEX_SHADER);
+            gl.shaderSource(vertextShader, VERTEX_SOURCE);
+            gl.compileShader(vertextShader);
+
+            let fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+            gl.shaderSource(fragmentShader, FRAGMENT_SOURCE);
+            gl.compileShader(fragmentShader);
+
+            program = gl.createProgram();
+            gl.attachShader(program, vertextShader);
+            gl.attachShader(program, fragmentShader);
+            gl.linkProgram(program);
+            gl.useProgram(program);
+
+            gl.deleteShader(vertextShader);
+            gl.deleteShader(fragmentShader);
+
+            let position = new Float32Array([
+                -0.5,-0.5,
+                 0.5, -0.5,
+                 0, 0.5           
+                
+            ]);
+
+            let color = new Float32Array([
+                1,0,0, //rojo
+                0,1,0, //verde
+                0,0,1, //azul           
+                
+            ]);
+
+            vbo_position = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, vbo_position);
+            gl.bufferData(gl.ARRAY_BUFFER, position, gl.STATIC_DRAW);
+
+            vbo_color = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, vbo_color);
+            gl.bufferData(gl.ARRAY_BUFFER, color, gl.STATIC_DRAW);
+
+            gl.bindBuffer(gl.ARRAY_BUFFER,vbo_position);
+            gl.vertexAttribPointer(in_position_loc, 2, gl.FLOAT, false, 0, 0);
+            gl.enableVertexAttribArray(in_position_loc);
+
+            gl.bindBuffer(gl.ARRAY_BUFFER,vbo_color);
+            gl.vertexAttribPointer(in_color_loc, 2, gl.FLOAT, false, 0, 0);
+            gl.enableVertexAttribArray(in_color_loc);
+
+
+            gl.clearColor(0, 0, 0, 1);
+            gl.clear(gl.COLOR_BUFFER_BIT);
+            gl.drawArrays(gl.TRIANGLES, 0, 3);
+
+        }
+
+    </script>    
+holi
+</body>
+</html>
